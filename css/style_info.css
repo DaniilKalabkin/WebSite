@@ -1,0 +1,31 @@
+.text__inner{
+    max-height: 100% ;
+    background-color: antiquewhite;
+    padding-left: 25px;
+    padding-bottom: 30px;
+
+}
+.text h3{
+    font-size: 30px;
+    right: 50%;
+    text-align: center;
+    padding-right: 10px ;
+    font-weight:bold;
+    padding-top: 20px;
+}
+.text h2{
+    font-size: 25px;
+    margin-top: 40px;
+}
+.text ul{
+    list-style: url('/media/examples/rocket.svg');
+    padding-left: 25px;
+}
+.text li{
+    padding-left: 20px;
+    font-size: 25px;
+    margin-top: 20px;
+}
+.text__inst li{
+    list-style: none;
+}

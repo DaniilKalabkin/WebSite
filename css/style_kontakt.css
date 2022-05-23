@@ -1,0 +1,32 @@
+.text__inner{
+    max-height: 100%;
+    background-color: antiquewhite;
+    padding-top: 20px;
+    padding-bottom: 50px;
+}
+.text h3{
+    padding-left: 25px;
+    font-size: 25px;
+    font-weight:bold;
+    margin-top: 30px;
+}
+.text h2{
+    padding-left: 25px;
+    font-size: 23px;
+    font-weight:bold;
+    margin-top: 30px;
+}
+.text h1{
+    padding-left: 25px;
+    font-size: 21px;
+    margin-top: 20px;
+}
+.text li{
+    padding-left: 25px;
+    font-size: 21px;
+    margin-top: 15px;
+}
+.Maps{
+    padding-left: 25px;
+    margin-top: 15px;
+}
