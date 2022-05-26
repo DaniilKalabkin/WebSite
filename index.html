@@ -1,10 +1,20 @@
 <?php
     ob_start();
     $pdo = new PDO("mysql:host=193.124.177.57;dbname=db526480", "u526480umgh", "lZGtq9KXFkmmwr2tkzTr");
-    $info = [];  
-    $sql = 'SELECT * FROM Genres_Knigi';
+    $info = [];
+    $sortir;
+    $poisk;
+    if($_POST['submit'])
+     $poisk =  $_POST['text'];   
+    $sql = 'SELECT Kniga,Genre,Avtor,Data_izd, izdanie,Vid_knigi,Silka_na_knigi,Kniga.Silka_na_Kartinku,Kniga.id_knigi
+    FROM Kniga_Avtor 
+    inner join Kniga_Genres  ON Kniga_Avtor.id_Knigi = Kniga_Genres.id_Knigi 
+    inner join Kniga  ON Kniga.id_knigi = Kniga_Avtor.id_Knigi
+    inner join Genres_Knigi ON Genres_Knigi.id_genres = Kniga_Genres.id_Genres
+    inner join Avtori ON Avtori.id_Avtor = Kniga_Avtor.id_Avtor
+    Where(Kniga LIKE "%'.$poisk.'%" ) || (Avtor LIKE "%'.$poisk.'%" )';
     $q = $pdo->query($sql);
-    $info = $q->fetchAll(PDO::FETCH_ASSOC); 
+    $info = $q->fetchAll(PDO::FETCH_ASSOC);
     if (!empty($_COOKIE['sid'])) {session_id($_COOKIE['sid']);}
     session_start();
     require_once 'classes/Auth.class.php';
@@ -16,7 +26,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Жанры</title>
+    <title>Главная страница</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/reset.css">
     <link href="https://fonts.googleapis.com/css2?family=Amatic+SC&family=Caveat:wght@700&family=Lato:wght@400;700;900&family=Pacifico&family=Play&display=swap" rel="stylesheet">
@@ -25,10 +35,18 @@
     <header class="header">
         <div class="container">
             <div class="header__inner">
+                <div class="header__aut">
+                    <ul>
+                        <form action="" method="POST">
+                            <input type="text" name="text" placeholder="Название книги,автор...">
+                            <input type="submit" name="submit" value="Поиск" class = "Poisk">
+                        </form>
+                    </ul>
+                </div>
                 <div class="header__logo">
                     <ul>
                         <li class="logo"><a href="index.html">
-                        Читаем<span>Вместе</span></a></li>
+                            Читаем<span>Вместе</span></a></li>
                         <li class="logo__logo"><a href="index.html">
                             Электронная библиотека</a></li>
                     </ul>
@@ -57,7 +75,6 @@
                     <ul><li>Здраствуйте Читатель!</li></ul>
                     <?php endif; ?>
                 </div>
-                <div class="header__poisk"></div>
             </div>
         </div>
     </header>
@@ -67,8 +84,7 @@
                 <nav class="section__nav">
                     <ul>
                         <li><a href="index.html">Главная страница</a></li>
-                        <li><a href="index_genres.php">Жанры</a>
-                        </li>
+                        <li ><a href="index_genres.php">Жанры </a>
                         <li><a href="index_avtor.php">Авторы</a></li>
                         <?php if (Auth\User::isAuthorized()): ?>
                         <li><a href="users_kab.html">Личный кабинет</a></li>
@@ -78,31 +94,54 @@
             </div>
         </div>
     </section>
-    <section class="Genres">
+    <section class="Knigi">
         <div class="container">
             <div class="knigi__inner">
-                <div class="Genres_Text">
-                    <form action="" method="POST">
-                        <?php  foreach($info as $d): ?>
-                        <input  name="<?php $i++; echo $i; ?>" type="submit" value="<?php  echo $d['Genre'];?>"/>
-                            <?php 
-                            if (isset($_POST[$i]))  
-                                {
-                                    $sortir = $d['Genre'];
-                                };?>
-                        <?php 
-                        endforeach;
-                        if($sortir != null){
-                            include "genr.php";
-                        }
+                <?php 
+                foreach($info as $d): ?>
+                <div class="kniga">
+                    <ul class="knigaa">
+                    <?php 
+                     $si++;
                         ?>
-                    </form>
-                    
+                        <li> <img src="<?php echo $d['Silka_na_Kartinku']; ?>" width="209" height="337" alt=""> </li>
+                        <li>Название книги:<?php echo $d['Kniga']; ?></li>
+                        <li>Автор: <?php echo $d['Avtor']; ?></li>
+                        <li>Жанры:<?php echo $d['Genre']; ?></li>
+                        <li>Год издания:<?php echo $d['Data_izd']; ?></li>
+                        <li>Издание:<?php echo $d['izdanie']; ?> </li>
+                        <?php if (Auth\User::isAuthorized()): ?>
+                        <li> <form action="" method="POST"><input  name="<?php $m++; echo $m; ?>" type="submit" value="Добавить книгу"/> </form></li>
+                        <?php endif; ?>
+                        <ul class="Bottom">
+                            <li ><a href="<?php echo $d['Silka_na_knigi']; ?>">Читать</a></li>
+                            <li ><a href="<?php echo $d['Silka_na_knigi']; ?>" download>Скачать</a></li>
+                        </ul>
+                        <?php 
+                            if (isset($_POST[$m]))  
+                                {
+                                        $id = $d['id_knigi'];
+                                        include  "new_record.php";
+                                };?>
+                    </ul>
                 </div>
+                
+                <?php 
+                endforeach;
+                ?>
+                <span class = "Waring"><?php if($info == $info[0])
+                          echo "Ничего не найдено!"  ; ?></span>
             </div>
         </div>
     </section>
-    <footer>
+    <section class = "Wrap">
+        <div class= "container">
+            <div class= "wrapper" >
+                <button class = "wrapper_button">Показать ещё</button>
+            </div>
+        </div>
+    </section>
+<footer>
     <div class = "container">
         <div class="footer-distributed">
             <div class="footer-right">
@@ -120,6 +159,10 @@
         </div>
     </div>
 </footer>
-    
         </body>
+<script src="jquery-2.0.3.min.js"></script><script src="ajax-form.js"></script>
+<script src="/js/wrapper.js"></script>
+<?php  if($perexod == 1)
+    header('Refresh: 0; url=http://untitled/new_record.php');
+    ?>
 </html>

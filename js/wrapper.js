@@ -2,8 +2,10 @@ $(document).ready(function() {
     var list = $(".knigi__inner .kniga");
     var numToShow = 6; //сколько показывать элементов
     var button = $("button");
+    var lom = $(".lom");
     var numInList = list.length;
     list.hide();
+    lom.hide();
     if (numInList < numToShow) {
       button.hide();
     }

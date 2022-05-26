@@ -11,6 +11,10 @@ ob_end_clean();
   Where(Genre LIKE "%'.$sortir.'%")';
  $q = $pdo->query($sql);
  $info = $q->fetchAll(PDO::FETCH_ASSOC); 
+ if (!empty($_COOKIE['sid'])) {session_id($_COOKIE['sid']);}
+    session_start();
+    require_once 'classes/Auth.class.php';
+    require_once 'stayt.php';
                         
 ?>
 <!DOCTYPE html>
@@ -30,13 +34,36 @@ ob_end_clean();
             <div class="header__inner">
                 <div class="header__logo">
                     <ul>
-                        <li class="logo"><a href="">
+                        <li class="logo"><a href="index.html">
                             Читаем<span>Вместе</span></a></li>
-                        <li class="logo__logo"><a href="">
+                        <li class="logo__logo"><a href="index.html">
                             Электронная библиотека</a></li>
                     </ul>
                 </div>
-                <div class="header__poisk"></div>
+                <div class = "header__aut">
+                <?php if (Auth\User::isAuthorized()): ?>
+                    <p class="privet">Привет, <?php echo "<span class='name'>".$arr['names']."</span>!";?></p>
+                    <form novalidate="novalidate" class="form-signin-2 ajax" method="post" action="ajax.php">
+                        <input type="hidden" name="act" value="logout">
+                        <input type="submit" class="vyxod" value="Выйти" />
+                    </form>
+                <?php else: ?>
+                    <a href="" class = "header__autt"> Вход</a>
+                    <form class="form-signin ajax" method="post" action="ajax.php">
+                    <p class="ogl">Авторизация</p>
+                    <div class="main-error alert alert-error hide"></div>
+                    <span class="testex">Введите E-mail</span><br />
+                    <input name="username" type="text" class="input-block-level"><br />
+                    <span class="testex">Введите пароль</span><br />
+                    <input name="password" type="password" class="input-block-level"><br />
+                    <input type="checkbox" name="remember-me" style="display:none" checked>
+                    <input type="hidden" name="act" value="login">
+                    <input type="submit" class="button"  value="Войти">
+                    </form>
+                    <a href="registr.php"> Регистрация </a>
+                    <ul><li>Здраствуйте Читатель!</li></ul>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </header>
@@ -45,9 +72,12 @@ ob_end_clean();
             <div class="section__inner">
                 <nav class="section__nav">
                     <ul>
-                        <li><a href="index.php">Главная страница</a></li>
+                        <li><a href="index.html">Главная страница</a></li>
                         <li ><a href="index_genres.php">Жанры </a>
                         <li><a href="index_avtor.php">Авторы</a></li>
+                        <?php if (Auth\User::isAuthorized()): ?>
+                        <li><a href="users_kab.html">Личный кабинет</a></li>
+                        <?php endif; ?>
                     </ul>
                 </nav>
             </div>
@@ -65,10 +95,19 @@ ob_end_clean();
                         <li>Жанры:<?php echo $d['Genre']; ?></li>
                         <li>Год издания:<?php echo $d['Data_izd']; ?></li>
                         <li>Издание:<?php echo $d['izdanie']; ?> </li>
+                        <?php if (Auth\User::isAuthorized()): ?>
+                        <li> <form action="" method="POST"><input  name="<?php $m++; $m++; echo $m; ?>" type="submit" value="Добавить книгу"/> </form></li>
+                        <?php endif; ?>
                         <ul class="Bottom">
                             <li ><a href="<?php echo $d['Silka_na_knigi']; ?>">Читать</a></li>
                             <li ><a href="<?php echo $d['Silka_na_knigi']; ?>" download>Скачать</a></li>
                         </ul>
+                        <?php 
+                            if (isset($POST[$m]))  
+                                {
+                                        $id = $d['id_knigi'];
+                                        include  "new_record.php";
+                        };?>
                 </div>
                 <?php 
                 endforeach;
@@ -78,23 +117,5 @@ ob_end_clean();
             </div>
         </div>
     </section>
-    <footer>
-    <div class = "container">
-        <div class="footer-distributed">
-            <div class="footer-right">
-            <a href="https://vk.com/public213478821" style="background-image: url('/icons/VK-Icon_icon-icons.com_52860.png'); "></a>
-            <a href="#" style="background-image: url('/icons/github_git_hub_logo_icon_132878.png');"></a>
-            </div>
-        <div class="footer-left">
-            <p class="footer-links">
-                <a class="link-1" href="index.php">Главная страница</a>
-                <a href="index_info.html">Информация о сайте</a>
-                <a href="index_kontakt.html">Контакты</a>
-            </p>
-        <p>КИТП &copy; 2022</p>
-            </div>
-        </div>
-    </div>
-</footer>
         </body>
 </html>
